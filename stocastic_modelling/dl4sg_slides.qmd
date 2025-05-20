@@ -29,7 +29,7 @@ format:
 **Udeshi Salgado**  
 _Data Lab for Social Good,_ <br>
 _Cardiff University, UK_  
-2025-05-17
+2025-05-22
 
 :::
 
@@ -65,16 +65,21 @@ theorems.
 
 #  <span style="color: black;">Outline</span>
 
-1. <span style="color: red;">Recap</span>
+1. `Recap`
 2. Continuous Time Markov Chains (CTMC)
-3. Queueing Theory
-4. Lab Activity: Vaccine Clinic Operations
+3. Lab Activity: Part 1 – CTMC (Vaccine Observation Room)
+4. Queueing Theory
+5. Lab Activity: Part 2 – Queueing Theory (Check-In Desk)
 
-## Recap: Assumptions
+## Recap: Discrete-Time Markov Chain (DTMC) Assumptions
 
-- The Markov chain is in exactly one state at any particular time step.
-- The probability distribution for the next state only depends on the current state  (Markov property).
-- The transition probabilities are the same on every time step.
+- The system is always in exactly one state at any given time step.
+- The next state depends only on the current state, not on the past (Markov property).
+- Transitions happen at fixed, regular time steps.
+- Transition probabilities stay the same over time.
+
+## Recap: State Space and Parameter Space
+![](images/parameter_and_state_space.png){fig-align="center"}
 
 ## Recap: Discrete MC Vs Continuous MC
 ![](images/discretevscontinuous.png)
@@ -82,9 +87,10 @@ theorems.
 # <span style="color: black;">Outline</span>
 
 1. Recap
-2. <span style="color: red;">Continuous Time Markov Chains (CTMC)</span>
-3. Queueing Theory
-4. Lab Activity: Vaccine Clinic Operations
+2. `Continuous Time Markov Chains`
+3. Lab Activity: Part 1 – CTMC (Vaccine Observation Room)
+4. Queueing Theory
+5. Lab Activity: Part 2 – Queueing Theory (Check-In Desk)
 
 ## Continuous Time Markov Chains (CTMC)
 
@@ -94,31 +100,69 @@ theorems.
 
 ## Exponential Timing in CTMCs
 
-- **Assumption**: Time until the next transition follows an **Exponential(λ)** distribution, where **λ is the transition rate** (higher λ → shorter expected time between transitions) 
-- **Memoryless Property**:  
-    $$ 
-    \Pr(X > t + u \mid X > u) = \Pr(X > t) $$
-- Past time in a state doesn’t affect future transitions
-- Transition probability depends only on the **current state** → **Markov property**
+- **Assumption:** In a **Continuous-Time Markov Chain (CTMC)**, the time until the next state transition is modeled as a random variable  
+  $$ 
+    T \sim \text{Exponential}(\lambda)
+  $$  
+  where:  
+  - $T$ = time until next transition  
+  - $\lambda > 0$ = **transition rate** (higher $\lambda$ → faster transitions)
+
+## Exponential Timing in CTMCs Cont.
+
+- The **memoryless property** of the exponential distribution:  
+  $$
+  \Pr(T > t + u \mid T > u) = \Pr(T > t) \quad \text{for all } t, u > 0
+  $$
+
+  ![](images/memoryless.png){width=200%, fig-align="center"}
+
+- **Interpretation:** Time already spent in the current state does **not** influence the probability of future transitions.
+
+- This is consistent with the **Markov property**:  `The future depends only on the current state, not the past.`
+  
+
+## Key Concepts: Stochastic Process, Time & State Spaces
+
+- A **stochastic process** is a collection of random variables $\{X(t)\}$ indexed by time $t$.
+
+- The **parameter space** defines the set of time points:
+    - For continuous-time processes: $t \in [0, \infty)$.
+
+- The **state space** $S$ is the set of all possible values $X(t)$ can take:
+    - Typically finite or countably infinite, e.g., $S = \{0, 1, 2, \dots\}$.
+
+- $X(t)$ represents the **state of the system at time $t$**.
 
 ## CTMCs: Definition
 
-> **A continuous-time Markov chain** is a stochastic process  
->  
-> $$
-> \{X(t) \mid t \geq 0\}
-> $$
->
-> in which the probability of some future event (say \( A \)) depends **only** on the **current state**, not on past states.
->
-> Formally:
->
-> $$
-> \Pr(A \mid X(t),\, 0 \leq t \leq T) = \Pr(A \mid X(T))
-> $$
+A **continuous-time Markov chain (CTMC)** is a stochastic process:
+
+$$
+\{X(t) \mid t \geq 0\}
+$$
+
+where:
+
+- $X(t)$ is a **random variable** representing the system's **state at time $t$**.
+- $t$ belongs to the **parameter space** $[0, \infty)$.
+- The values of $X(t)$ come from a **state space** $S$, usually finite or countable.
+
+## CTMCs: Definition Cont.
+
+The process satisfies the **Markov property**:
+
+$$
+\Pr(A \mid X(t),\, 0 \leq t \leq T) = \Pr(A \mid X(T))
+$$
+
+where:
 
 
-As in the discrete-time case, the key idea is:  **future behavior depends only on the current state**.
+- $A$ is any **future event**.
+- The future depends **only on the current state** $X(T)$, not on the history.
+
+
 
 ## CTMC Example: Managing a Tiny Shop's Flow
 
@@ -209,15 +253,22 @@ $$
 \boldsymbol{\pi} \mathbf{Q} = \mathbf{0}, \quad \text{with} \quad \sum \pi_i = 1
 $$
 
+Where: $Q$ is the **generator matrix** of the CTMC, $\boldsymbol{\pi}$ is a **row vector** of steady-state probabilities.
+
 ---
 
 ## Solving the System
 
 From:
 
-- $-\pi_0 + 0.25\pi_1 = 0 \Rightarrow \pi_1 = 4\pi_0$
-- $\pi_1 - 0.5\pi_2 = 0 \Rightarrow \pi_2 = 2\pi_1 = 8\pi_0$
-- $\pi_0 + 4\pi_0 + 8\pi_0 = 13\pi_0 = 1 \Rightarrow \pi_0 = \frac{1}{13}$
+$$
+\begin{aligned}
+&-\pi_0 + 0.25\pi_1 = 0 \\
+&\pi_0 - 1.25\pi_1 + 0.5\pi_2 = 0 \\
+&\pi_1 - 0.5\pi_2 = 0 \\
+&\pi_0 + \pi_1 + \pi_2 = 1
+\end{aligned}
+$$
 
 Thus:
 $$
@@ -262,8 +313,49 @@ A queueing system (e.g., customer service desk, call center, clinic) can often b
 
   1. Recap
   2. Continuous Time Markov Chains (CTMC)
-  3. <span style="color: red;">Queueing Theory</span>
-  4. Lab Activity: Vaccine Clinic Operations
+  3. `Lab Activity: Part 1 – CTMC (Vaccine Observation Room)`
+  4. Queueing Theory
+  5. Lab Activity: Part 2 – Queueing Theory (Check-In Desk)
+
+## Lab Activity: Part 1 – CTMC (Vaccine Observation Room)
+
+In this section, you’ll model an **observation room** where recently vaccinated patients are monitored for adverse events. The room has limited capacity (e.g., 2 beds).
+
+We will use a **Continuous-Time Markov Chain (CTMC)** to:
+
+- Construct the **generator matrix** ($Q$)
+- Write and solve the **steady-state equations**
+- Interpret the **long-run distribution** across states
+
+Make sure you load the required R packages:  `Matrix`, `expm`
+
+---
+
+![](images/yourturn.png)
+
+<button id="timer-btn-4" onclick="startTimer('timer-btn-4', 900)" style="
+  position: absolute;
+  bottom: 1em;
+  right: 2em;
+  padding: 12px 18px;
+  font-size: 1.2em;
+  font-weight: bold;
+  border-radius: 8px;
+  border: 2px solid #ccc;
+  background-color: #f9f9f9;
+  color: #333;
+  font-family: monospace;
+">
+⏳ 15:00
+</button>
+
+# <span style="color: black;">Outline</span>
+
+  1. Recap
+  2. Continuous Time Markov Chains (CTMC)
+  3. Lab Activity: Part 1 – CTMC (Vaccine Observation Room)
+  4. `Queueing Theory`
+  5. Lab Activity: Part 2 – Queueing Theory (Check-In Desk)
 
 ## Queueing Theory
 <br>
@@ -654,20 +746,21 @@ Which model applies?
 
 1. Recap
 2. Continuous Time Markov Chains (CTMC)
-3. Queueing Theory
-4. <span style="color: red;">Lab Activity: Vaccine Clinic Operations</span>
+3. Lab Activity: Part 1 – CTMC (Vaccine Observation Room)
+4. Queueing Theory
+5. `Lab Activity: Part 2 – Queueing Theory (Check-In Desk)`
 
-## Lab Activity: Vaccine Clinic Operations
+## Lab Activity: Part 2 – Queueing Theory (Check-In Desk)
 
-In this hands-on session, you’ll use R code to explore how Continuous-Time Markov Chains (CTMCs) and Queueing Theory help us understand operations at a rural vaccine clinic.
+In this section, you’ll model the **check-in desk** where patients arrive and wait to be registered by a nurse.
 
-We'll work through:
+We will use an **M/M/1 queue** to:
 
-- A **CTMC** model for an observation room with limited space
-- An **M/M/1 queue** for a check-in desk staffed by one nurse
-- Scenario analysis and steady-state evaluation
-
-> Make sure R and the necessary libraries are ready (e.g., `Matrix`, `expm`).
+- Calculate **traffic intensity** ($\rho = \lambda / \mu$)
+- Compute steady-state metrics:
+    - Average number in system ($L$) and queue ($L_q$)
+    - Waiting times ($W$, $W_q$)
+- Reflect on how arrival/service rates affect congestion
 
 You’ll be guided with real-world tasks followed by code. Let's begin!
 
