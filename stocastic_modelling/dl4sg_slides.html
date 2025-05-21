@@ -167,7 +167,7 @@
 <section id="materials" class="slide level2">
 <h2>Materials</h2>
 <ul>
-<li>You can find the workshop materials at here.</li>
+<li>You can find the workshop materials at <a href="https://udeshisalgado.github.io/talks.html">here</a>.</li>
 <li>Note: These materials are based on my learnings at <a href="https://www.natcor.ac.uk/courses/">NATCOR Taught Course Centre: Stochastic Modelling Course</a></li>
 </ul>
 </section>
@@ -182,6 +182,10 @@
 <li>Lab Activity: Part 2 – Queueing Theory (Check-In Desk)</li>
 </ol>
 </section>
+<section id="recap-quiz-time" class="slide level2">
+<h2>Recap: Quiz Time!</h2>
+
+<img data-src="images/quiz.png" class="quarto-figure quarto-figure-center r-stretch"></section>
 <section id="recap-discrete-time-markov-chain-dtmc-assumptions" class="slide level2">
 <h2>Recap: Discrete-Time Markov Chain (DTMC) Assumptions</h2>
 <ul>
@@ -556,8 +560,7 @@ T \sim \text{Exp}(\lambda)
 </section>
 <section id="the-mm1-queue-cont." class="slide level2">
 <h2>The M/M/1 Queue Cont.</h2>
-<p><strong>Traffic intensity:</strong><br>
-<span class="math display">\[
+<p><strong>Traffic intensity:</strong> <code>How busy the system is?</code> <span class="math display">\[
 \rho = \frac{\lambda}{\mu}
 \]</span></p>
 <ul>
@@ -571,14 +574,16 @@ If arrivals outpace service, the system can’t cope.</p>
 <section id="mm1-as-a-ctmc" class="slide level2">
 <h2>M/M/1 as a CTMC</h2>
 <ul>
-<li><p>The M/M/1 queue can be modeled as a <strong>Continuous-Time Markov Chain (CTMC)</strong> with <strong>states</strong> representing the number of customers in the system.</p></li>
-<li><p>It forms a <strong>birth-death process</strong>:</p>
+<li>The <strong>M/M/1 queue</strong> can be modeled as a <strong>Continuous-Time Markov Chain (CTMC)</strong>.</li>
+<li><strong>States</strong> represent the number of customers in the system: 0, 1, 2, …</li>
+<li>The process is a <strong>birth–death process</strong>:
 <ul>
-<li><strong>Arrivals (births)</strong> at rate <span class="math inline">\(\lambda\)</span></li>
-<li><strong>Departures (deaths)</strong> at rate <span class="math inline">\(\mu\)</span></li>
+<li><strong>Births (arrivals)</strong> occur at rate <span class="math inline">\(\lambda\)</span></li>
+<li><strong>Deaths (departures)</strong> occur at rate <span class="math inline">\(\mu\)</span></li>
 </ul></li>
 </ul>
-</section>
+
+<img data-src="images/mm1_state.png" class="quarto-figure quarto-figure-center r-stretch"></section>
 <section id="mm1-as-a-ctmc-cont." class="slide level2">
 <h2>M/M/1 as a CTMC Cont.</h2>
 <p><strong>Generator matrix (Q):</strong></p>
@@ -597,28 +602,55 @@ If arrivals outpace service, the system can’t cope.</p>
 </section>
 <section id="mm1-stationary-distribution-performance" class="slide level2">
 <h2>M/M/1: Stationary Distribution &amp; Performance</h2>
-<p>With steady-state probabilities <span class="math inline">\(\{p_n,\ n \geq 0\}\)</span>:</p>
-<ul>
-<li>Probability the system is <strong>empty</strong> <span class="math display">\[
-  p_0 = 1 - \rho
-  \]</span></li>
-<li>Probability the <strong>server is busy</strong> <span class="math display">\[
-  1 - p_0 = \rho
-  \]</span></li>
-<li>Probability of <strong><span class="math inline">\(n\)</span> customers</strong> in the system <span class="math display">\[
-  p_n = \rho^n (1 - \rho)
-  \]</span></li>
-</ul>
-</section>
-<section id="mm1-stationary-distribution-performance-cont." class="slide level2">
-<h2>M/M/1: Stationary Distribution &amp; Performance Cont.</h2>
-<p><strong>Mean number of customers in the system (L):</strong></p>
+<p>Assume the system reaches <strong>steady state</strong> (<span class="math inline">\(\rho &lt; 1\)</span>), with probabilities <span class="math inline">\(\{p_n,\ n \geq 0\}\)</span>.</p>
+<p>These come from solving the <strong>balance equations</strong> of the CTMC:</p>
+<p><strong>State 0 balance:</strong></p>
 <p><span class="math display">\[
-L = \sum_{n=0}^\infty n p_n
-= (1 - \rho) \sum_{n=0}^\infty n \rho^n
+\lambda p_0 = \mu p_1
+\]</span></p>
+<p><strong>For <span class="math inline">\(n \geq 1\)</span>:</strong></p>
+<p><span class="math display">\[
+(\lambda + \mu)p_n = \lambda p_{n-1} + \mu p_{n+1}
+\]</span></p>
+</section>
+<section class="slide level2">
+
+<p>Solving recursively gives:</p>
+<p><span class="math display">\[
+p_n = \rho^n p_0 \quad \text{where} \quad \rho = \frac{\lambda}{\mu}
+\]</span></p>
+<p>Then apply the <strong>normalization condition</strong>:</p>
+<p><span class="math display">\[
+\sum_{n=0}^\infty p_n = 1 \quad \Rightarrow \quad p_0 = 1 - \rho
+\]</span></p>
+</section>
+<section class="slide level2">
+
+<p>So we get:</p>
+<ul>
+<li><p>Probability the system is <strong>empty</strong>:<br>
+<span class="math display">\[p_0 = 1 - \rho\]</span></p></li>
+<li><p>Probability the <strong>server is busy</strong>:<br>
+<span class="math display">\[1 - p_0 = \rho\]</span></p></li>
+<li><p>Probability of <strong><span class="math inline">\(n\)</span> customers</strong> in the system:<br>
+<span class="math display">\[p_n = \rho^n (1 - \rho)\]</span></p></li>
+</ul>
+<p>🧠 These describe the <strong>stationary distribution</strong> of the M/M/1 queue.</p>
+</section>
+<section id="mm1-mean-number-in-system-l" class="slide level2">
+<h2>M/M/1: Mean Number in System (<span class="math inline">\(L\)</span>)</h2>
+<p><strong>Expected number of customers in the system</strong>:</p>
+<p><span class="math display">\[
+L = \sum_{n=0}^{\infty} n p_n
+= \sum_{n=0}^{\infty} n \rho^n (1 - \rho)
+= \rho \sum_{n=1}^{\infty} n \rho^{n-1} (1 - \rho)
 = \frac{\rho}{1 - \rho}
 \]</span></p>
-<p>This is one of the key performance metrics in queueing theory.</p>
+<ul>
+<li>This is one of the <strong>key performance metrics</strong> in queueing analysis.</li>
+<li><span class="math inline">\(L\)</span> increases sharply as <span class="math inline">\(\rho \to 1\)</span>, showing how queues explode near capacity.</li>
+</ul>
+<p>💡 Use this to inform decisions on service rates (<span class="math inline">\(\mu\)</span>) to keep queues manageable.</p>
 </section>
 <section id="performance-measures-in-queueing" class="slide level2">
 <h2>Performance Measures in Queueing</h2>
@@ -633,13 +665,24 @@ L = \sum_{n=0}^\infty n p_n
 <section id="littles-law" class="slide level2">
 <h2>Little’s Law</h2>
 <p>A fundamental relationship linking <strong>arrival rate</strong>, <strong>waiting time</strong>, and <strong>number in the system</strong>.</p>
-<p>Relates these measures:</p>
+<h3 id="mean-number-of-customers-in-the-system">Mean number of customers <strong>in the system</strong>:</h3>
 <p><span class="math display">\[
-L = \lambda W,\quad L_q = \lambda W_q
+L = \lambda W \qquad \text{($\lambda$ = arrival rate, $W$ = mean time in system)}
 \]</span></p>
 <p>Also:</p>
 <p><span class="math display">\[
-W = W_q + \frac{1}{\mu},\quad L = L_q + \frac{\lambda}{\mu}
+L = L_q + \frac{\lambda}{\mu} \qquad \text{(total in system = queue + in service)}
+\]</span></p>
+</section>
+<section class="slide level2">
+
+<h3 id="mean-waiting-time">Mean <strong>waiting time</strong>:</h3>
+<p><span class="math display">\[
+W = W_q + \frac{1}{\mu} \qquad \text{($W_q$ = time in queue, $\frac{1}{\mu}$ = service time)}
+\]</span></p>
+<h3 id="mean-number-of-customers-in-the-queue">Mean number of customers <strong>in the queue</strong>:</h3>
+<p><span class="math display">\[
+L_q = \lambda W_q \qquad \text{($\lambda$ = arrival rate, $W_q$ = mean time in queue)}
 \]</span></p>
 </section>
 <section id="mm1-queue-performance-formulas" class="slide level2">

@@ -60,7 +60,7 @@ theorems.
 
 ## Materials
 
-- You can find the workshop materials at here.
+- You can find the workshop materials at [here](https://udeshisalgado.github.io/talks.html).
 - Note: These materials are based on my learnings at [NATCOR Taught Course Centre: Stochastic Modelling Course](https://www.natcor.ac.uk/courses/)
 
 #  <span style="color: black;">Outline</span>
@@ -70,6 +70,9 @@ theorems.
 3. Lab Activity: Part 1 – CTMC (Vaccine Observation Room)
 4. Queueing Theory
 5. Lab Activity: Part 2 – Queueing Theory (Check-In Desk)
+
+## Recap: Quiz Time!
+![](images/quiz.png){fig-align="center"}
 
 ## Recap: Discrete-Time Markov Chain (DTMC) Assumptions
 
@@ -434,7 +437,7 @@ A Poisson process with rate $\lambda$ models **random arrivals over time**, wher
 
 ## The M/M/1 Queue Cont.
 
-**Traffic intensity:**  
+**Traffic intensity:**  `How busy the system is?`
 $$
 \rho = \frac{\lambda}{\mu}
 $$
@@ -448,11 +451,15 @@ If arrivals outpace service, the system can't cope.
 
 ## M/M/1 as a CTMC
 
-- The M/M/1 queue can be modeled as a **Continuous-Time Markov Chain (CTMC)** with **states** representing the number of customers in the system.
+- The **M/M/1 queue** can be modeled as a **Continuous-Time Markov Chain (CTMC)**.
+- **States** represent the number of customers in the system: 0, 1, 2, ...
+- The process is a **birth–death process**:
+  - **Births (arrivals)** occur at rate $\lambda$
+  - **Deaths (departures)** occur at rate $\mu$
 
-- It forms a **birth-death process**:
-    - **Arrivals (births)** at rate $\lambda$
-    - **Departures (deaths)** at rate $\mu$
+![](images/mm1_state.png){width=100%, fig-align="center"}
+
+
 
 ## M/M/1 as a CTMC Cont.
 
@@ -470,35 +477,70 @@ $$
 
 - This structure defines the dynamics of the queue over time.
 
-
 ## M/M/1: Stationary Distribution & Performance
 
-With steady-state probabilities $\{p_n,\ n \geq 0\}$:
+Assume the system reaches **steady state** ($\rho < 1$), with probabilities $\{p_n,\ n \geq 0\}$.
 
-- Probability the system is **empty**
-    $$
-    p_0 = 1 - \rho
-    $$
-- Probability the **server is busy**
-    $$
-    1 - p_0 = \rho
-    $$
-- Probability of **$n$ customers** in the system
-    $$
-    p_n = \rho^n (1 - \rho)
-    $$
+These come from solving the **balance equations** of the CTMC:
 
-## M/M/1: Stationary Distribution & Performance Cont.
-
-**Mean number of customers in the system (L):**
+**State 0 balance:**
 
 $$
-L = \sum_{n=0}^\infty n p_n 
-= (1 - \rho) \sum_{n=0}^\infty n \rho^n 
+\lambda p_0 = \mu p_1
+$$
+
+**For $n \geq 1$:**
+
+$$
+(\lambda + \mu)p_n = \lambda p_{n-1} + \mu p_{n+1}
+$$
+
+---
+
+Solving recursively gives:
+
+$$
+p_n = \rho^n p_0 \quad \text{where} \quad \rho = \frac{\lambda}{\mu}
+$$
+
+Then apply the **normalization condition**:
+
+$$
+\sum_{n=0}^\infty p_n = 1 \quad \Rightarrow \quad p_0 = 1 - \rho
+$$
+
+---
+
+So we get:
+
+- Probability the system is **empty**:  
+  $$p_0 = 1 - \rho$$
+
+- Probability the **server is busy**:  
+  $$1 - p_0 = \rho$$
+
+- Probability of **$n$ customers** in the system:  
+  $$p_n = \rho^n (1 - \rho)$$
+
+🧠 These describe the **stationary distribution** of the M/M/1 queue.
+
+
+## M/M/1: Mean Number in System ($L$)
+
+**Expected number of customers in the system**:
+
+$$
+L = \sum_{n=0}^{\infty} n p_n 
+= \sum_{n=0}^{\infty} n \rho^n (1 - \rho) 
+= \rho \sum_{n=1}^{\infty} n \rho^{n-1} (1 - \rho) 
 = \frac{\rho}{1 - \rho}
 $$
 
-This is one of the key performance metrics in queueing theory.
+- This is one of the **key performance metrics** in queueing analysis.
+- $L$ increases sharply as $\rho \to 1$, showing how queues explode near capacity.
+
+💡 Use this to inform decisions on service rates ($\mu$) to keep queues manageable.
+
 
 ## Performance Measures in Queueing
 
@@ -514,18 +556,32 @@ Four key summary performance measures:
 
 A fundamental relationship linking **arrival rate**, **waiting time**, and **number in the system**.
 
-Relates these measures:
+### Mean number of customers **in the system**:
 
 $$
-L = \lambda W,\quad L_q = \lambda W_q
+L = \lambda W \qquad \text{($\lambda$ = arrival rate, $W$ = mean time in system)}
 $$
 
 Also:
 
 $$
-W = W_q + \frac{1}{\mu},\quad L = L_q + \frac{\lambda}{\mu}
+L = L_q + \frac{\lambda}{\mu} \qquad \text{(total in system = queue + in service)}
 $$
 
+---
+
+### Mean **waiting time**:
+
+$$
+W = W_q + \frac{1}{\mu} \qquad \text{($W_q$ = time in queue, $\frac{1}{\mu}$ = service time)}
+$$
+
+
+### Mean number of customers **in the queue**:
+
+$$
+L_q = \lambda W_q \qquad \text{($\lambda$ = arrival rate, $W_q$ = mean time in queue)}
+$$
 
 ## M/M/1 Queue: Performance Formulas
 

@@ -16,6 +16,17 @@ execute:
   warning: false
 ---
 
+```{r setup, include=FALSE}
+# Load required libraries
+
+#install.packages("Matrix")
+library(Matrix)
+
+#install.packages("expm")
+library(expm)
+
+```
+
 # Introduction
 
 In this short lab, we'll explore how Continuous-Time Markov Chains (CTMCs) and Queueing Theory apply to healthcare settings using realistic examples. The goal is to build intuition and hands-on familiarity through code you can run and interpret.
@@ -32,27 +43,26 @@ In a rural health facility, adults are being vaccinated against rubella. After r
 
 Can you build a model of the possible occupancy changes in this small clinic? Think about transitions between 0, 1, or 2 patients and how often they happen.
 
-```{r}
+```{r, eval=FALSE}
 Q <- matrix(c(
-  -1.0,  1.0,  0.0,
-   1/10, -1.1, 1.0,
-   0.0,  1/8, -1/8
+  __, __, __,
+  __, __, __,
+  __, __, __
 ), nrow = 3, byrow = TRUE)
 Q
+
 ```
 
 ## Task 2. How much time does the clinic spend in each state?
 
 Over a long day, how much time does the clinic spend in each state — 0, 1, or 2 patients in the observation room?
 
-```{r}
-library(Matrix)
-
+```{r, eval=FALSE}
 steady_state <- function(Q) {
-  A <- t(Q)
-  A[nrow(A), ] <- rep(1, ncol(Q))  # normalisation
-  b <- c(0, 0, 1)
-  solve(A, b)
+  A <- t(Q) # Transpose Q so rows become equations
+  A[nrow(A), ] <- rep(1, ncol(Q))  # Replace last row with 1s for normalization
+  b <- c(__, __, __) # RHS of the linear system (0s and 1
+  solve(__, __) #Solve the linear system A * pi = b
 }
 
 pi <- steady_state(Q)
@@ -64,65 +74,91 @@ pi
 
 Let’s visualize the convergence to the steady-state distribution by tracking the probability of each state over time.
 
-```{r}
+### Understanding Convergence in a CTMC
 
-#install.packages("expm")
+Before we plot how the system converges, let’s understand the math behind it.
 
-library(expm)  # for matrix exponential
+In a **Continuous-Time Markov Chain (CTMC)**, the system moves between states randomly over continuous time. To know how the system evolves, we want to compute:
 
-# Time points66
-times <- seq(0, 100, by = 1)
+> **What is the probability of being in each state after time t?**
 
-# Initial state (start empty)
-p0 <- c(1, 0, 0)
+This is given by the formula:
 
-# Compute evolution over time
-probs_over_time <- t(sapply(times, function(t) p0 %*% expm(Q * t)))
+> **State distribution at time t = Initial distribution × exp(Q × t)**
 
+- The **initial distribution** is a row vector (e.g., `p0 <- c(1, 0, 0)` if the system starts in State 0).
+- The **matrix exponential**, written as `exp(Q × t)` in R, gives the **transition probability matrix** at time `t`.
+- Multiplying the two gives us the **probability distribution across states** at that time.
+
+We repeat this calculation for many time points (e.g., from 0 to 100 minutes) to see **how the system changes over time** and eventually **settles into a steady state**.
+
+In the next task, you’ll:
+
+- Define the time points
+- Set the initial condition
+- Use a loop to calculate the probability vector at each time
+- Plot how the state probabilities evolve
+
+Let’s implement this now.
+
+
+```{r, eval=FALSE}
+# Define a sequence of time points
+times <- seq(___, ___, by = ___)
+
+# Set the initial state distribution (starts in State 0)
+p0 <- c(___, ___, ___)
+
+# Compute how probabilities evolve over time
+probs_over_time <- t(sapply(times, function(t) p0 %*% expm(___)))
+
+# Plot the result
 matplot(times, probs_over_time, type = "l", lty = 1, lwd = 2,
         col = c("blue", "orange", "red"),
         ylab = "Probability", xlab = "Time",
         main = "Convergence to Steady State")
+
 legend("right", legend = c("State 0", "State 1", "State 2"),
-       col = c("blue", "orange", "red"), lty = 1, lwd = 2)
+        col = c("blue", "orange", "red"), lty = 1, lwd = 2)
+
 ```
 
 Explain: How long does it take for the system to reach equilibrium? Which state dominates during the transient phase?
 
 _**Answer:**_
 
-_Based on the convergence plot, the system reaches its equilibrium (steady-state) approximately **within 15 to 20 minutes**. This is evident from the point at which the probabilities for all three states stabilize and no longer change significantly over time._
+______________________
 
-_During the **initial transient phase**, the system starts from an empty state (State 0), so the probability of being in State 0 is initially 1. As time progresses, patients begin arriving, and the probability of being in State 1 (one patient in the room) increases briefly. However, this is quickly overtaken by State 2 (two patients in the room), whose probability rises rapidly and becomes the dominant state._
+______________________
 
-_Once equilibrium is reached, **State 2 clearly dominates**, maintaining a high steady-state probability (approximately 88%). This indicates that under the current arrival and observation rates, the clinic operates at or near full capacity for most of the time._
+______________________
 
 ## Task 4. How many people are typically in the room?
 
 On average, how many people are being observed in the room at any given time? This gives a sense of how often the room is full or idle.
 
-```{r}
-sum(0:2 * pi)
+```{r, eval=FALSE}
+sum(0:2 * __)
 ```
 
 
 ## Task 5. What if more patients start coming in?
 
-Due to a new outreach campaign and the arrival of a donor-funded vaccine shipment, community interest in rubella vaccination has surged. As a result, patients are now arriving every 30 seconds, doubling the previous arrival rate. Observation lasts 20 minutes*when one person is present. If two patients are present, they both stay for 17 minutes.
+Due to a new outreach campaign and the arrival of a donor-funded vaccine shipment, community interest in rubella vaccination has surged. As a result, patients are now arriving every 30 minutes, doubling the previous arrival rate. Observation lasts 20 minutes when one person is present. If two patients are present, they both stay for 17 minutes.
 
 How does this change the expected number of patients inside the room?
 
-```{r}
+```{r, eval=FALSE}
 Q2 <- matrix(c(
-  -2, 2, 0.0,
-   1/20, -2.0588, 2,
-   0.0, 1/17, -1/17
+  __, __, __,
+  __, __, __,
+  __, __, __
 ), nrow = 3, byrow = TRUE)
 
-pi2 <- steady_state(Q2)
+pi2 <- steady_state(__)
 round(pi2, 4)
 
-sum(0:2 * pi2)  # new expected number
+sum(0:2 * __)  # new expected number
 ```
 
 ---
@@ -134,15 +170,15 @@ In the same rural vaccine clinic, patients begin their visit at a **check-in des
 
 The clinic administrator wants to know: How busy is the nurse? How long does each patient spend waiting and checking in? And how many people are typically in the system?
 
-```{r}
-lambda <- 1/2  # arrivals per minute
-mu <- 2/3      # service rate per minute (1/1.5)
+```{r, eval=FALSE}
+lambda <- __  # arrivals per minute
+mu <- __      # service rate per minute (1/1.5)
 
-rho <- lambda / mu
-L <- rho / (1 - rho)
-Lq <- rho^2 / (1 - rho)
-W <- 1 / (mu * (1 - rho))
-Wq <- rho / (mu * (1 - rho))
+rho <- __ / __
+L <- __ / (1 - __)
+Lq <- __^2 / (1 - __)
+W <- 1 / (mu * (1 - __))
+Wq <- __ / (mu * (1 - __))
 
 list(
   Utilization = round(rho, 2),
@@ -157,15 +193,24 @@ list(
 
 Imagine the clinic gets busier over time — more patients show up without any increase in staff. Let’s see how the average number of patients and the uncertainty around that number change.
 
-```{r}
+```{r, eval=FALSE}
+# Define a sequence of traffic intensity (ρ) values from 0.01 to 0.99
 rho_vals <- seq(0.01, 0.99, by = 0.01)
-L_vals <- rho_vals / (1 - rho_vals)
-Var_vals <- rho_vals * (1 + rho_vals - rho_vals^2) / (1 - rho_vals)^2
 
+# Calculate the average number of patients in the system (L)
+L_vals <- ___ / (1 - ___)   # FILL IN: Use rho_vals
+
+# Calculate the variance of the number of patients in the system
+# We calculate the variance to understand how unpredictable the system is.
+# A high variance means it's harder to estimate how many patients are actually there at any time.
+Var_vals <- ___ * (1 + ___ - ___^2) / (1 - ___)^2   # FILL IN: Use rho_vals multiple times
+
+# Plot the results
 plot(rho_vals, L_vals, type = "l", col = "red", lwd = 2,
      ylim = c(0, 40), ylab = "Mean & Variance in System", xlab = "Traffic Intensity (ρ)")
 lines(rho_vals, Var_vals, col = "blue", lwd = 2, lty = 2)
 legend("topleft", legend = c("Mean", "Variance"), col = c("red", "blue"), lty = c(1, 2), lwd = 2)
+
 
 ```
 
@@ -173,8 +218,8 @@ Explain: What does the graph suggest about the workload and predictability of th
 
 ***Answer***
 
-_As traffic intensity ($\rho$) increases, both the **mean** and **variance** of the number of patients in the system grow rapidly. The red curve in the plot shows the average number of patients in the system, while the dashed blue curve represents the variance (i.e., how much the system fluctuates)._
+______________________
 
-_When the system is lightly loaded (e.g., $\rho < 0.5$), both mean and variance remain low. However, as $\rho$ approaches 1 — meaning patient arrivals nearly match or exceed the nurse's capacity to serve them — the average number of people waiting increases sharply, and the system becomes **unpredictable**._
+______________________
 
-_This pattern suggests that if the clinic continues to get busier without adding more staff, **queues will grow longer** and **waiting times will become highly variable**, making it hard to manage patient flow effectively. Clinic managers should aim to keep traffic intensity well below 1 to ensure smooth and stable operations._
+______________________
